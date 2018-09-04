@@ -1,0 +1,12 @@
+
+/control/execute icons.mac
+/control/execute vis.mac
+
+/gui/addMenu run Run
+/gui/addButton run "beamOn 1" "/run/beamOn 1"
+/gui/addButton run "beamOn 10" "/run/beamOn 10"
+/gui/addButton run "beamOn 100" "/run/beamOn 100"
+/gui/addButton run "beamOn 1000" "/run/beamOn 1000"
+
+# User defined icon :
+/gui/addIcon "Run beam on" user_icon "/run/beamOn 1" run.png 
