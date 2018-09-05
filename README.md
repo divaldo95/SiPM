@@ -11,6 +11,7 @@ The output file is a ROOT file. Can be checked by TBrowser.
 * Linux or MacOS (should work on Windows, not tested)
 
 ## Building
+Before building, be sure that you changed the macroPath to the right directory in sipm.cc.
 ```
 git clone https://git.divaldo.hu/divaldo/SiPM.git
 mkdir build_dir && cd build_dir
