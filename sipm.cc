@@ -25,15 +25,48 @@
 #include "G4OpticalPhysics.hh"
 #include "G4OpticalProcessIndex.hh"
 #include "LXePhysicsList.hh"
+#include "SiPMParameters.hh"
 #include "SiPMAnalysis.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-int main(int argc,char** argv)
+int main(int argc, char** argv)
 {
-    // parameter from command line
+    SiPMParameters *parameters = SiPMParameters::GetInstance();
+    
+    bool visualization = true;
     int NoE=0;
-    if (argc==2) NoE=atoi(argv[1]);
+    
+    // parameter from command line
+    for(int i = 1; i < argc; i++)
+    {
+        if(!strcmp("-df", argv[i])) //number of events
+        {
+            std::cout << "Settings will be read from the default file." << std::endl;
+            parameters -> ParseConfigFile();
+        }
+        else if(!strcmp("-f", argv[i])) //number of events
+        {
+            std::string filename;
+            if(argc-1 >= i+1)
+            {
+                filename = argv[i+1];
+                std::cout << "Settings will be read from " << filename << "." << std::endl;
+                parameters -> ParseConfigFile(filename);
+            }
+            if(filename.empty())
+            {
+                std::cout << "File name not given, using the default values" << std::endl;
+            }
+        }
+        else if(!strcmp("-v", argv[i])) //number of events
+        {
+            std::cout << "Visualization disabled." << std::endl;
+            visualization = false;
+        }
+    }
+    
+    NoE = parameters -> GetNumberOfEvents();
     
 #ifdef G4MULTITHREADED
     G4MTRunManager* runManager = new G4MTRunManager;
@@ -42,31 +75,31 @@ int main(int argc,char** argv)
 #else
     G4RunManager* runManager = new G4RunManager;
 #endif
-    //you will modify this part ///////////
     runManager->SetUserInitialization(new LXePhysicsList());
     runManager->SetUserInitialization(new SiPMDetectorConstruction());
     //runManager->SetUserInitialization(new QGSP_BIC);
     runManager->SetUserInitialization(new SiPMActionInitialization());
     ///////////////
     
+    //Initialize the analysis instance here first to avoid crash
     SiPMAnalysis *analysis = SiPMAnalysis::getInstance();
     
     G4VisManager* visManager = new G4VisExecutive;
     visManager->Initialize();
     G4UImanager* UImanager = G4UImanager::GetUIpointer();
     
-    if (argc==2) {
+    if (visualization == false)
+    {
         // batch mode
         runManager->Initialize();
         runManager->BeamOn(NoE);
     }
-    else {
+    else
+    {
         // interactive mode
         G4UIExecutive* ui = 0;
-        if ( argc == 1 ) {
-            ui = new G4UIExecutive(argc, argv);
-        }
-        UImanager->ApplyCommand("/control/macroPath /Users/divaldo/Programming/DE-Detector"); //set for your environment
+        ui = new G4UIExecutive(argc, argv);
+        UImanager->ApplyCommand("/control/macroPath ./macros"); //set for your environment
         UImanager->ApplyCommand("/control/execute gui.mac");
         ui->SessionStart();
         delete ui;
