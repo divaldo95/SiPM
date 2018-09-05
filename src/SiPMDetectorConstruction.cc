@@ -101,17 +101,6 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     G4LogicalVolume *logicContainer =
     new G4LogicalVolume(solidContainer, world_mat, "Container");
     
-    /*
-     G4VPhysicalVolume *physContainer =
-     new G4PVPlacement(0,
-     G4ThreeVector(),
-     logicContainer,
-     "Container",
-     logicWorld,
-     false,
-     0,
-     checkOverlaps);
-     */
     G4Colour containerColour( 1.0, 1.0, 0.0);
     G4VisAttributes* containerVisAtt = new G4VisAttributes( containerColour );
     //logicContainer -> SetVisAttributes(containerVisAtt);
@@ -313,35 +302,6 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     
     SurfacefromScintillatorToSipm -> SetMaterialPropertiesTable(ScintillatorMaterialPropertyTable);
     
-    //Surface
-    /*
-    G4int matrixX = 3;
-    G4int matrixY = 3;
-    G4VPVParameterisation *chamberParam = new SiPMParameterisation(matrixX,
-                                                                   matrixY,
-                                                                   0,
-                                                                   sipm_width);
-     */
-    
-    /*new G4PVParameterised("Chamber",       // their name
-                          logicContainer,   // their logical volume
-                          physWorld,       // Mother logical volume
-                          kXAxis,          // Are placed along this axis
-                          3,    // Number of chambers
-                          chamberParam,    // The parametrisation
-                          true); // checking overlaps
-     */
-    /*
-    new G4PVParameterised("Chamber",       // their name
-                          logicContainer,   // their logical volume
-                          physWorld,       // Mother logical volume
-                          kYAxis,          // Are placed along this axis
-                          matrixX * matrixY,    // Number of chambers
-                          chamberParam,    // The parametrisation
-                          true); // checking overlaps
-    */
-    //G4VPVParameterisation *paramSipm = new G4VPVParameterisation();
-    
     //Using G4PVPlacement instead of replica or others
     
      int x = parameters -> GetXDivison();
@@ -357,15 +317,13 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
              snprintf(s1, 30, "Container_x%d_y%d", i, j);
              logicContainer -> SetName(s1);
              physContainer[x][y] = new G4PVPlacement(0,
-                                                     G4ThreeVector(i*cm, j*cm, 0),
+                                                     G4ThreeVector(i*container_sizeX, j*container_sizeY, 0),
                                                      logicContainer,
                                                      s1, //its name
                                                      logicWorld,
                                                      false,
                                                      helper, //copy number
                                                      checkOverlaps);
-             //physSipm0 -> SetCopyNo(helper);
-             //physSipm1 -> SetCopyNo(helper);
              helper++;
          }
      }
