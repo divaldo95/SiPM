@@ -24,6 +24,9 @@ public:
     static SiPMParameters *GetInstance();
     ~SiPMParameters();
     
+    //---Config file---------------------------------------------------------------------------------------
+    void ParseConfigFile(); //Read the default config file
+    void ParseConfigFile(std::string config_file1); //Read another config file
     
     //---Particle Gun parameters---------------------------------------------------------------------------
     void SetParticleGunPosition(G4ThreeVector pgp) { particleGun_position = pgp; }
@@ -57,11 +60,20 @@ public:
     void SetScintillatorRadius(G4double sc_r) { scint_radius = sc_r; }
     G4double GetScintillatorRadius() { return scint_radius; }
     
+    //---Number of Events----------------------------------------------------------------------------------
+    void SetNumberOfEvents(G4int noe1) { numberofevents = noe1; }
+    G4int GetNumberOfEvents() { return numberofevents; }
+    
     void ResetToDefaults();
     
 private:
     SiPMParameters();
     static SiPMParameters *instance;
+    
+    //---Config file---------------------------------------------------------------------------------------
+    std::string config_file;
+    void StoreConfigValues(std::string key1, std::string value1);
+    void CheckValues();
     
     G4ThreeVector particleGun_position;
     G4ThreeVector particleGun_MomentumDirection;
@@ -74,6 +86,8 @@ private:
     G4int y_division;
     
     G4double scint_radius;
+    
+    G4int numberofevents;
     
 };
 

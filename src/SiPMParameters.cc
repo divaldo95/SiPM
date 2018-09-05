@@ -23,6 +23,7 @@ SiPMParameters* SiPMParameters::instance = 0;
 
 SiPMParameters::SiPMParameters()
 {
+    config_file = "config.conf";
     ResetToDefaults();
 }
 
@@ -43,4 +44,162 @@ void SiPMParameters::ResetToDefaults()
     y_division = 10;
     
     scint_radius = 0.25; //in cm
+    
+    numberofevents = 10;
+}
+
+void SiPMParameters::ParseConfigFile()
+{
+    std::string line;
+    try
+    {
+        std::ifstream configfile(config_file);
+        if(configfile.is_open())
+        {
+            while (getline(configfile, line))
+            {
+                std::istringstream is_line(line);
+                std::string key;
+                if (std::getline(is_line, key, '='))
+                {
+                    std::string value;
+                    if(std::getline(is_line, value))
+                    {
+                        StoreConfigValues(key, value);
+                    }
+                }
+            }
+        }
+        CheckValues();
+    }
+    catch (char param)
+    {
+        std::cout << param << std::endl;
+    }
+}
+
+void SiPMParameters::ParseConfigFile(std::string config_file1)
+{
+    config_file = config_file1;
+    ParseConfigFile();
+}
+
+void SiPMParameters::StoreConfigValues(std::string key1, std::string value1)
+{
+    //---Particle gun position---------------------------------------------------------------------------------------------------
+    if(key1.compare("pgpositionx") == 0)
+    {
+        particleGun_position.setX(std::stod(value1));
+        std::cout << "Particle Gun X position parsed from config file! Value = " << particleGun_position.getX() << std::endl;
+    }
+    else if(key1.compare("pgpositiony") == 0)
+    {
+        particleGun_position.setY(std::stod(value1));
+        std::cout << "Particle Gun Y position parsed from config file! Value = " << particleGun_position.getY() << std::endl;
+    }
+    else if(key1.compare("pgpositionz") == 0)
+    {
+        particleGun_position.setZ(std::stod(value1));
+        std::cout << "Particle Gun Z position parsed from config file! Value = " << particleGun_position.getZ() << std::endl;
+    }
+    
+    //---Particle gun momentum----------------------------------------------------------------------------------------------------
+    else if(key1.compare("pgmomentumx") == 0)
+    {
+        particleGun_MomentumDirection.setX(std::stod(value1));
+        std::cout << "Particle Gun X momentum parsed from config file! Value = " << particleGun_MomentumDirection.getX() << std::endl;
+    }
+    else if(key1.compare("pgmomentumy") == 0)
+    {
+        particleGun_MomentumDirection.setY(std::stod(value1));
+        std::cout << "Particle Gun Y momentum parsed from config file! Value = " << particleGun_MomentumDirection.getY() << std::endl;
+    }
+    else if(key1.compare("pgmomentumz") == 0)
+    {
+        particleGun_MomentumDirection.setZ(std::stod(value1));
+        std::cout << "Particle Gun Z momentum parsed from config file! Value = " << particleGun_MomentumDirection.getZ() << std::endl;
+    }
+    
+    //---Particle gun energy------------------------------------------------------------------------------------------------------
+    else if(key1.compare("pgenergy") == 0)
+    {
+        particleGun_energy = std::stod(value1);
+        std::cout << "Particle Gun energy parsed from config file! Value = " << particleGun_energy << std::endl;
+    }
+    
+    //---SiPM dimensions----------------------------------------------------------------------------------------------------------
+    else if(key1.compare("sipmsizex") == 0)
+    {
+        sipm_Dimension.setX(std::stod(value1));
+        std::cout << "SiPM X size parsed from config file! Value = " << sipm_Dimension.getX() << std::endl;
+    }
+    else if(key1.compare("sipmsizey") == 0)
+    {
+        sipm_Dimension.setY(std::stod(value1));
+        std::cout << "SiPM Y size parsed from config file! Value = " << sipm_Dimension.getY() << std::endl;
+    }
+    else if(key1.compare("sipmsizez") == 0)
+    {
+        sipm_Dimension.setZ(std::stod(value1));
+        std::cout << "SiPM Z size parsed from config file! Value = " << sipm_Dimension.getZ() << std::endl;
+    }
+    
+    //---Sscintillator------------------------------------------------------------------------------------------------------------
+    else if(key1.compare("scintillatorlength") == 0)
+    {
+        scintillator_length = std::stod(value1);
+        std::cout << "Scintillator length parsed from config file! Value = " << scintillator_length << std::endl;
+    }
+    else if(key1.compare("scintillatorradius") == 0)
+    {
+        scint_radius = std::stod(value1);
+        std::cout << "Scintillator radius parsed from config file! Value = " << scint_radius << std::endl;
+    }
+    
+    //---Sscintillator------------------------------------------------------------------------------------------------------------
+    else if(key1.compare("xdivision") == 0)
+    {
+        x_division = std::stod(value1);
+        std::cout << "X division parsed from config file! Value = " << x_division << std::endl;
+    }
+    else if(key1.compare("ydivision") == 0)
+    {
+        y_division = std::stod(value1);
+        std::cout << "Y division parsed from config file! Value = " << y_division << std::endl;
+    }
+    
+    //---Number of events---------------------------------------------------------------------------------------------------------
+    else if(key1.compare("numberofevents") == 0)
+    {
+        numberofevents = std::stod(value1);
+        std::cout << "Number of events parsed from config file! Value = " << numberofevents << std::endl;
+    }
+}
+
+void SiPMParameters::CheckValues()
+{
+    if(x_division <= 0)
+    {
+        std::cout << "X division is at least 1, setting back the default value." << std::endl;
+        x_division = 1;
+    }
+    if(y_division <= 0)
+    {
+        std::cout << "Y division is at least 1, setting back the default value." << std::endl;
+        y_division = 1;
+    }
+    if(scint_radius*2 > sipm_Dimension.getX() || scint_radius*2 > sipm_Dimension.getY())
+    {
+        std::cout << "Scintillator diameter can not be larger than the SiPM, ";
+        if(sipm_Dimension.getX() < sipm_Dimension.getY())
+        {
+            scint_radius = sipm_Dimension.getX() / 2;
+            std::cout << "changed to " << scint_radius * 2 << std::endl;
+        }
+        else
+        {
+            scint_radius = sipm_Dimension.getY() / 2;
+            std::cout << "changed to " << scint_radius * 2 << std::endl;
+        }
+    }
 }
