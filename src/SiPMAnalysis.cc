@@ -27,37 +27,19 @@ SiPMAnalysis::SiPMAnalysis()
         {
             snprintf(treename, 20, "%dx_%dy",i,j);
             ttree[counter] = new TTree(treename, treename);
-            ttree[counter] -> Branch("x", &x, "x/D");
-            ttree[counter] -> Branch("y", &y, "y/D");
-            ttree[counter] -> Branch("e", &e, "e/D");
-            ttree[counter] -> Branch("sipm", &sipm, "sipm/D");
-            ttree[counter] -> Branch("time", &time, "x/D");
+            ttree[counter] -> Branch("x", &x);
+            ttree[counter] -> Branch("y", &y);
+            ttree[counter] -> Branch("e", &e);
+            ttree[counter] -> Branch("sipm", &sipm);
+            ttree[counter] -> Branch("time", &time);
             counter++;
         }
     }
     counter = 0;
     
-    //ttree[0] = new TTree("tree", "tree");
     file = new TFile(filename,"RECREATE");
     instance = this;
     SiPMAnalysisMutex = G4MUTEX_INITIALIZER;
-    
-    /*
-    for(int i = 0; i < xDiv; i++)
-    {
-        for (int j = 0; j < yDiv; j++)
-        {
-            ttree[counter] -> Branch("x", &x, "x/D");
-            ttree[counter] -> Branch("y", &y, "x/D");
-            ttree[counter] -> Branch("e", &e, "x/D");
-            ttree[counter] -> Branch("sipm", &sipm, "x/D");
-            ttree[counter] -> Branch("time", &time, "x/D");
-            counter++;
-        }
-        
-    }
-    counter = 0;
-     */
 }
 
 SiPMAnalysis::~SiPMAnalysis()
