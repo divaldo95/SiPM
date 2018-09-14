@@ -253,9 +253,9 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     
     //material of scintillator
     G4double rind_scintillator[n] = {1.59, 1.57}; //refraction index
-    G4double absl[n] = {35.*cm, 35.*cm}; //absorption length
-    G4double slow[n] = {0.1, 1};
-    G4double fast[n] = {0.1, 1};
+    G4double absl[n] = {35.*m, 35.*m}; //absorption length
+    G4double slow[n] = {1, 1};
+    G4double fast[n] = {1, 1};
     
     G4MaterialPropertiesTable *scint_material_mpt = new G4MaterialPropertiesTable();
     
@@ -265,9 +265,9 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     scint_material_mpt -> AddProperty("FASTCOMPONENT", pp, fast, n);
     scint_material_mpt -> AddConstProperty("SCINTILLATIONYIELD", 50./MeV); //50 volt
     scint_material_mpt -> AddConstProperty("RESOLUTIONSCALE", 1.0);
-    scint_material_mpt -> AddConstProperty("FASTTIMECONSTANT", 20.*ns);
-    scint_material_mpt -> AddConstProperty("SLOWTIMECONSTANT", 45.*ns);
-    scint_material_mpt -> AddConstProperty("YIELDRATIO", 1);
+    scint_material_mpt -> AddConstProperty("FASTTIMECONSTANT", 0.01*ns);
+    scint_material_mpt -> AddConstProperty("SLOWTIMECONSTANT", 1.*ns);
+    scint_material_mpt -> AddConstProperty("YIELDRATIO", 0.1);
     
     scint_mat -> SetMaterialPropertiesTable(scint_material_mpt);
     

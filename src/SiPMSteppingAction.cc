@@ -71,7 +71,7 @@ void SiPMSteppingAction::UserSteppingAction(const G4Step* step)
             std::cout << "Photon reached Sipm0 at: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo() << std::endl;
             std::cout << "Mother Logical name: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetName() << std::endl;
             
-            analysis -> Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 1, step -> GetPostStepPoint() -> GetGlobalTime());
+            analysis -> Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 1, fTrack -> GetGlobalTime());
             
             //sipm0_num++;
         }
@@ -85,7 +85,7 @@ void SiPMSteppingAction::UserSteppingAction(const G4Step* step)
             std::cout << "Local time: " << postTime << std::endl;
             //std::cout << "Photon reached Sipm1 at copy no: " << postvolume -> GetCopyNo() << std::endl;
             //sipm1_num++;
-            analysis -> Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 2, step -> GetPostStepPoint() -> GetGlobalTime());
+            analysis -> Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 2, fTrack -> GetGlobalTime());
         }
         /*if(postName == "Scintillator_W")
          {
