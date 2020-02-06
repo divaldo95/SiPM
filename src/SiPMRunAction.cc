@@ -42,8 +42,8 @@ void SiPMRunAction::EndOfRunAction(const G4Run* run)
     // Print
     //
     if (IsMaster()) {
-        SiPMAnalysis *analysis = SiPMAnalysis::getInstance();
-        analysis -> Close();
+        SiPMAnalysis &analysis = SiPMAnalysis::getInstance();
+        analysis.Close();
         G4cout
         << G4endl
         << "--------------------End of Global Run-----------------------";

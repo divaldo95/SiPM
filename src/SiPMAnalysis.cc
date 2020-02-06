@@ -8,17 +8,17 @@
 
 #include "SiPMAnalysis.hh"
 
-SiPMAnalysis::SiPMAnalysis()
+SiPMAnalysis::SiPMAnalysis(const std::string& _filename) : filename(_filename)
 {
-    SiPMParameters *parameters = SiPMParameters::GetInstance();
-    G4int xDiv = parameters -> GetXDivison();
-    G4int yDiv = parameters -> GetYDivison();
+    SiPMParameters &parameters = SiPMParameters::GetInstance();
+    G4int xDiv = parameters.GetXDivison();
+    G4int yDiv = parameters.GetYDivison();
     noOfSipm = xDiv * yDiv;
     G4int counter = 0;
     
-    char filename[20];
-    char treename[20];
-    snprintf(filename, 30, "data.root");
+    char filename1[30];
+    char treename[30];
+    snprintf(filename1, 30, filename.c_str());
     ttree = std::vector<TTree*>(noOfSipm,0);
     
     for(int i = 0; i < xDiv; i++)
@@ -37,9 +37,7 @@ SiPMAnalysis::SiPMAnalysis()
     }
     counter = 0;
     
-    file = new TFile(filename,"RECREATE");
-    instance = this;
-    SiPMAnalysisMutex = G4MUTEX_INITIALIZER;
+    file = new TFile(filename1,"RECREATE");
 }
 
 SiPMAnalysis::~SiPMAnalysis()
@@ -47,21 +45,17 @@ SiPMAnalysis::~SiPMAnalysis()
     
 }
 
-SiPMAnalysis* SiPMAnalysis::getInstance()
+SiPMAnalysis& SiPMAnalysis::getInstance(const std::string& _filename)
 {
-    if (instance == 0)
-    {
-        std::cout << "Created analysis instance" << std::endl;
-        instance = new SiPMAnalysis();
-    }
-    
+    static SiPMAnalysis instance(_filename);    
     return instance;
 }
 
 void SiPMAnalysis::Fill(int copyNo, double x1, double y1, double e1, int sipm1, double time1)
 {
-    G4AutoLock lock(&SiPMAnalysisMutex);
-    
+    //std::lock_guard<std::mutex> guard(SiPMAnalysisMutex);
+
+    SiPMAnalysisMutex.lock();
     x = x1;
     y = y1;
     e = e1;
@@ -71,8 +65,7 @@ void SiPMAnalysis::Fill(int copyNo, double x1, double y1, double e1, int sipm1, 
     ttree[copyNo] -> Fill();
     
     ttree[copyNo] -> FlushBaskets();
-    
-    lock.unlock();
+    SiPMAnalysisMutex.unlock();
 }
 
 void SiPMAnalysis::Close()
@@ -83,6 +76,3 @@ void SiPMAnalysis::Close()
     }
     file -> Close();
 }
-
-/* Null, because instance will be initialized on demand. */
-SiPMAnalysis* SiPMAnalysis::instance = 0;

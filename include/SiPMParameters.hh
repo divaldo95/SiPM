@@ -21,7 +21,7 @@
 class SiPMParameters
 {
 public:
-    static SiPMParameters *GetInstance();
+    static SiPMParameters& GetInstance(const std::string& config_file_name = "config.conf");
     ~SiPMParameters();
     
     //---Config file---------------------------------------------------------------------------------------
@@ -65,15 +65,19 @@ public:
     G4int GetNumberOfEvents() { return numberofevents; }
     
     void ResetToDefaults();
+
+    SiPMParameters(const SiPMParameters&) = delete;
+    SiPMParameters& operator=(const SiPMParameters&) = delete;
     
 private:
-    SiPMParameters();
-    static SiPMParameters *instance;
+    SiPMParameters(const std::string& config_file_name);
+    void PrintUsedFilename();
     
     //---Config file---------------------------------------------------------------------------------------
     std::string config_file;
     void StoreConfigValues(std::string key1, std::string value1);
     void CheckValues();
+    bool conf_loaded = false;
     
     G4ThreeVector particleGun_position;
     G4ThreeVector particleGun_MomentumDirection;
@@ -88,6 +92,8 @@ private:
     G4double scint_radius;
     
     G4int numberofevents;
+
+    
     
 };
 

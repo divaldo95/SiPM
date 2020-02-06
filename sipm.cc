@@ -32,7 +32,8 @@
 
 int main(int argc, char** argv)
 {
-    SiPMParameters *parameters = SiPMParameters::GetInstance();
+    SiPMParameters& parameters = SiPMParameters::GetInstance();
+    SiPMAnalysis& analysis = SiPMAnalysis::getInstance();
     
     bool visualization = true;
     int NoE=0;
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
         if(!strcmp("-df", argv[i])) //number of events
         {
             std::cout << "Settings will be read from the default file." << std::endl;
-            parameters -> ParseConfigFile();
+            parameters.ParseConfigFile();
         }
         else if(!strcmp("-f", argv[i])) //number of events
         {
@@ -52,7 +53,7 @@ int main(int argc, char** argv)
             {
                 filename = argv[i+1];
                 std::cout << "Settings will be read from " << filename << "." << std::endl;
-                parameters -> ParseConfigFile(filename);
+                parameters.ParseConfigFile(filename);
             }
             if(filename.empty())
             {
@@ -66,7 +67,7 @@ int main(int argc, char** argv)
         }
     }
     
-    NoE = parameters -> GetNumberOfEvents();
+    NoE = parameters.GetNumberOfEvents();
     
 #ifdef G4MULTITHREADED
     G4MTRunManager* runManager = new G4MTRunManager;
@@ -82,7 +83,7 @@ int main(int argc, char** argv)
     ///////////////
     
     //Initialize the analysis instance here first to avoid crash
-    SiPMAnalysis *analysis = SiPMAnalysis::getInstance();
+    //SiPMAnalysis *analysis = SiPMAnalysis::getInstance();
     
     G4VisManager* visManager = new G4VisExecutive;
     visManager->Initialize();

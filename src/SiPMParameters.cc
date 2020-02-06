@@ -9,26 +9,25 @@
 
 #include "SiPMParameters.hh"
 
-SiPMParameters* SiPMParameters::GetInstance()
+SiPMParameters& SiPMParameters::GetInstance(const std::string& config_file_name)
 {
-    if (instance == 0)
-    {
-        instance = new SiPMParameters();
-    }
-    
+    static SiPMParameters instance(config_file_name);
+    instance.PrintUsedFilename();
     return instance;
 }
 
-SiPMParameters* SiPMParameters::instance = 0;
-
-SiPMParameters::SiPMParameters()
+SiPMParameters::SiPMParameters(const std::string& config_file_name) : config_file(config_file_name)
 {
-    config_file = "config.conf";
     ResetToDefaults();
 }
 
 SiPMParameters::~SiPMParameters()
 {
+}
+
+void SiPMParameters::PrintUsedFilename()
+{
+    std::cout << config_file << (conf_loaded ? " loaded." : " will be loaded. Call ParseConfigFile().") << std::endl;
 }
 
 void SiPMParameters::ResetToDefaults()

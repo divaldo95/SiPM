@@ -11,8 +11,6 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "G4Threading.hh"
-#include "G4AutoLock.hh"
 #include "TTree.h"
 #include "TFile.h"
 
@@ -20,37 +18,36 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <mutex>
 #include "SiPMParameters.hh"
 
 class SiPMAnalysis
 {
-private:
-    /* Here will be the instance stored. */
-    static SiPMAnalysis* instance;
-    
+private:    
     std::vector<TTree*> ttree;
-    //TTree *tree;
-    //TTree *electrontree;
     TFile *file;
     
-    G4Mutex SiPMAnalysisMutex;
+    mutable std::mutex SiPMAnalysisMutex;
     
     /* Private constructor to prevent instancing. */
-    SiPMAnalysis();
+    SiPMAnalysis(const std::string& _filename);
+
+    std::string filename;
+
     double x, y, e, time;
     int sipm;
     int noOfSipm = 0;
     
 public:
     ~SiPMAnalysis();
-    SiPMAnalysis(const SiPMAnalysis&) = delete;
-    SiPMAnalysis& operator=(const SiPMAnalysis&) = delete;
     
     void Fill(int copyNo, double x1, double y1, double e1, int sipm1, double time1);
     void Close();
-    
-    /* Static access method. */
-    static SiPMAnalysis* getInstance();
+
+    static SiPMAnalysis& getInstance(const std::string& _filename = "data.root");
+
+    SiPMAnalysis(const SiPMAnalysis&) = delete;
+    SiPMAnalysis& operator=(const SiPMAnalysis&) = delete;
 };
 
 #endif /* SiPMAnalysis_hh */

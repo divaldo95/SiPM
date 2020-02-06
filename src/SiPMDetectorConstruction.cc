@@ -26,7 +26,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     G4NistManager* nist = G4NistManager::Instance();
     
     //Get the parameters instance
-    SiPMParameters *parameters = SiPMParameters::GetInstance();
+    SiPMParameters& parameters = SiPMParameters::GetInstance();
     
     
     // Option to switch on/off checking of volumes overlaps
@@ -64,11 +64,11 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     //
     // World
     //
-    G4ThreeVector sipm_size = parameters -> GetSiPMSize();
+    G4ThreeVector sipm_size = parameters.GetSiPMSize();
     
-    G4double world_sizeX = parameters -> GetXDivison() * sipm_size.getX() * cm; //2*m;
-    G4double world_sizeY = parameters -> GetYDivison() * sipm_size.getY() * cm; //2*m;
-    G4double world_sizeZ  = 2*sipm_size.getZ() + parameters -> GetScintillatorLength();
+    G4double world_sizeX = parameters.GetXDivison() * sipm_size.getX() * cm; //2*m;
+    G4double world_sizeY = parameters.GetYDivison() * sipm_size.getY() * cm; //2*m;
+    G4double world_sizeZ  = 2*sipm_size.getZ() + parameters.GetScintillatorLength();
     G4Material* world_mat = air; //nist->FindOrBuildMaterial("G4_AIR");
     
     G4Box* solidWorld =
@@ -93,7 +93,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     //Place a container which contains everything for G4Replica
     G4double container_sizeX = sipm_size.getX()*cm;
     G4double container_sizeY = sipm_size.getY()*cm;
-    G4double container_sizeZ = (sipm_size.getZ()*2 + parameters -> GetScintillatorLength())*cm;
+    G4double container_sizeZ = (sipm_size.getZ()*2 + parameters.GetScintillatorLength())*cm;
     
     G4Box *solidContainer =
     new G4Box("Container", container_sizeX*0.5, container_sizeY*0.5, container_sizeZ*0.5);
@@ -156,7 +156,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     // box shape
     G4double scint_sizeX = sizeX;
     G4double scint_sizeY = sizeY;
-    G4double scint_sizeZ = parameters -> GetScintillatorLength() * cm;
+    G4double scint_sizeZ = parameters.GetScintillatorLength() * cm;
     
     G4double z_pos = sipm_width + (scint_sizeZ*0.5);
     
@@ -186,7 +186,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
      * Scintillator
      */
     
-    G4double scint_radius = parameters -> GetScintillatorRadius()*cm;
+    G4double scint_radius = parameters.GetScintillatorRadius()*cm;
     
     G4Tubs * solidScint = new G4Tubs("tube", 0, scint_radius, 0.5*(scint_sizeZ+(0.5*mm)), 0, 2*CLHEP::pi); //name, inner R, outter R, Half length in Z, starting angle, angle of the segment in rad
     new G4Box("Scintillator",
@@ -304,8 +304,8 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     
     //Using G4PVPlacement instead of replica or others
     
-     int x = parameters -> GetXDivison();
-     int y = parameters -> GetYDivison();
+     int x = parameters.GetXDivison();
+     int y = parameters.GetYDivison();
      int helper = 0;
      G4VPhysicalVolume *physContainer[x][y];
      char s1[30];
