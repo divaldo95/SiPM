@@ -70,6 +70,7 @@ void SiPMParameters::ParseConfigFile()
             }
         }
         CheckValues();
+        conf_loaded = true;
     }
     catch (char param)
     {
@@ -147,6 +148,7 @@ void SiPMParameters::StoreConfigValues(std::string key1, std::string value1)
     else if(key1.compare("scintillatorlength") == 0)
     {
         scintillator_length = std::stod(value1);
+        scintillator_Dimension.setZ(std::stod(value1));
         std::cout << "Scintillator length parsed from config file! Value = " << scintillator_length << std::endl;
     }
     else if(key1.compare("scintillatorradius") == 0)
@@ -165,6 +167,90 @@ void SiPMParameters::StoreConfigValues(std::string key1, std::string value1)
     {
         y_division = std::stod(value1);
         std::cout << "Y division parsed from config file! Value = " << y_division << std::endl;
+    }
+
+
+    else if (key1.compare("scintillatorsizex") == 0)
+    {
+        scintillator_Dimension.setX(std::stod(value1));
+        std::cout << "Scintillator X size set from config file! Value = " << y_division << std::endl;
+    }
+    else if (key1.compare("scintillatorsizey") == 0)
+    {
+        scintillator_Dimension.setY(std::stod(value1));
+        std::cout << "Scintillator Y size set from config file! Value = " << y_division << std::endl;
+    }
+    else if (key1.compare("scintillatorsizez") == 0)
+    {
+        scintillator_Dimension.setZ(std::stod(value1));
+        std::cout << "Scintillator Z size set from config file! Value = " << y_division << std::endl;
+    }
+
+    else if (key1.compare("scintillatorisbox") == 0)
+    {
+        if (std::stod(value1) != 0)
+        {
+            scintIsBox = true;
+            std::cout << "Using box scintillator." << std::endl;
+        }
+        else
+        {
+            scintIsBox = false;
+            std::cout << "Using tube scintillator." << std::endl;
+        }
+    }
+
+    else if (key1.compare("firstsipmenabled") == 0)
+    {
+        if (std::stod(value1) != 0)
+        {
+            sipm1Enabled = true;
+            std::cout << "First SiPM enabled." << std::endl;
+        }
+        else
+        {
+            sipm1Enabled = false;
+            std::cout << "First SiPM disabled." << std::endl;
+        }
+    }
+
+    else if (key1.compare("secondsipmenabled") == 0)
+    {
+        if (std::stod(value1) != 0)
+        {
+            sipm2Enabled = true;
+            std::cout << "Second SiPM enabled." << std::endl;
+        }
+        else
+        {
+            sipm2Enabled = false;
+            std::cout << "Second SiPM disabled." << std::endl;
+        }
+    }
+
+    else if (key1.compare("coatingthickness") == 0)
+    {
+        cThickness = std::stod(value1);
+        std::cout << "Coating thickness set to " << cThickness << std::endl;
+    }
+
+    else if (key1.compare("lengthunit") == 0)
+    {
+        if (value1.compare("mm") == 0)
+        {
+            std::cout << "Length unit is mm." << std::endl;
+            globalLengthUnit = mm;
+        }
+        else if (value1.compare("cm") == 0)
+        {
+            std::cout << "Length unit is cm." << std::endl;
+            globalLengthUnit = cm;
+        }
+        else if (value1.compare("m") == 0)
+        {
+            std::cout << "Length unit is m." << std::endl;
+            globalLengthUnit = m;
+        }
     }
     
     //---Number of events---------------------------------------------------------------------------------------------------------

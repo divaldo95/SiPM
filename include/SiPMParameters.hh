@@ -17,6 +17,7 @@
 #include <string>
 #include <sstream>
 #include "G4ThreeVector.hh"
+#include "G4SystemOfUnits.hh"
 
 class SiPMParameters
 {
@@ -24,6 +25,30 @@ public:
     static SiPMParameters& GetInstance(const std::string& config_file_name = "config.conf");
     ~SiPMParameters();
     
+    //---Units---------------------------------------------------------------------------------------------
+    enum lengthUnit { mm, cm, m };
+
+    void SetGlobalLengthUnit(lengthUnit l) { globalLengthUnit = l; }
+    double GetLengthMultiplier() //returns the correct length multiplier for the global length unit (use it instead of *cm/*mm/*m)
+    {
+        switch (globalLengthUnit)
+        {
+            case mm:
+                return millimeter;
+                break;
+            case cm:
+                return centimeter;
+                break;
+            case m:
+                return meter;
+                break;
+            default:
+                return centimeter;
+                break;
+        }
+    }
+
+
     //---Config file---------------------------------------------------------------------------------------
     void ParseConfigFile(); //Read the default config file
     void ParseConfigFile(std::string config_file1); //Read another config file
@@ -44,10 +69,18 @@ public:
     void SetSiPMSize(G4ThreeVector sipm_s) { sipm_Dimension = sipm_s; }
     void SetSiPMSize(G4double x, G4double y, G4double z) { sipm_Dimension.set(x, y, z); }
     G4ThreeVector GetSiPMSize() { return sipm_Dimension; }
+    void FirstSiPMEnabled(bool enabled) { sipm1Enabled = enabled; }
+    bool FirstSiPMEnabled() { return sipm1Enabled; }
+    void SecondSiPMEnabled(bool enabled) { sipm2Enabled = enabled; }
+    bool SecondSiPMEnabled() { return sipm2Enabled; }
     
     //---Scintillator parameters---------------------------------------------------------------------------
-    void SetScintillatorLength(G4double sc_l) { scintillator_length = sc_l; }
+    void SetScintillatorLength(G4double sc_l) { scintillator_length = sc_l; scintillator_Dimension.setZ(sc_l); }
     G4double GetScintillatorLength() { return scintillator_length; }
+    void SetScintillatorSize(G4double x, G4double y, G4double z) { scintillator_Dimension.set(x, y, z); }
+    G4ThreeVector GetScintillatorSize() { return scintillator_Dimension; }
+    double CoatingThickness() { return cThickness; }
+    void CoatingThickness(double t) { cThickness = t; }
     
     //---Division parameters-------------------------------------------------------------------------------
     void SetDivision(G4int x, G4int y) { x_division = x; y_division = y; };
@@ -58,7 +91,11 @@ public:
     
     //---Radius parameters---------------------------------------------------------------------------------
     void SetScintillatorRadius(G4double sc_r) { scint_radius = sc_r; }
-    G4double GetScintillatorRadius() { return scint_radius; }
+    G4double GetScintillatorRadius() { return scintIsBox ? 0.0 : scint_radius; } //If it is a box, return 0
+
+    //---Scintillator Tube vs box parameters---------------------------------------------------------------
+    void ScintillatorIsBox(bool isBox) { scintIsBox = isBox; }
+    bool ScintillatorIsBox() { return scintIsBox; }
     
     //---Number of Events----------------------------------------------------------------------------------
     void SetNumberOfEvents(G4int noe1) { numberofevents = noe1; }
@@ -85,16 +122,21 @@ private:
     
     G4ThreeVector sipm_Dimension; //applies to both (in cm)
     G4double scintillator_length; //the size same as sipm
+    G4double scint_radius;
+    G4ThreeVector scintillator_Dimension;
     
     G4int x_division;
     G4int y_division;
     
-    G4double scint_radius;
-    
     G4int numberofevents;
 
+    bool scintIsBox = true;
+    bool sipm1Enabled = true;
+    bool sipm2Enabled = false;
+
+    lengthUnit globalLengthUnit = cm; //default length is cm
     
-    
+    double cThickness = 1;
 };
 
 #endif /* Parameters_hh */

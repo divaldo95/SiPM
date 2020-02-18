@@ -16,10 +16,10 @@ SiPMPrimaryGeneratorAction::SiPMPrimaryGeneratorAction() : G4VUserPrimaryGenerat
     // default particle kinematic
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     G4String particleName;
-    G4ParticleDefinition* particle = particleTable->FindParticle(particleName="mu+");
+    G4ParticleDefinition* particle = particleTable->FindParticle(particleName="gamma");
     fParticleGun->SetParticleDefinition(particle);
     fParticleGun->SetParticleMomentumDirection(parameters.GetParticleGunMomentumDirection());
-    fParticleGun->SetParticleEnergy(parameters.GetParticleGunEnergy()*GeV); //1GeV
+    fParticleGun->SetParticleEnergy(parameters.GetParticleGunEnergy()*keV); //1GeV
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -34,6 +34,9 @@ SiPMPrimaryGeneratorAction::~SiPMPrimaryGeneratorAction()
 void SiPMPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
     SiPMParameters &parameters = SiPMParameters::GetInstance();
-    fParticleGun->SetParticlePosition(parameters.GetParticleGunPosition());
+    G4ThreeVector pgPos = parameters.GetParticleGunPosition();
+    double lengthMultiplier = parameters.GetLengthMultiplier();
+    pgPos.set(pgPos.getX() * lengthMultiplier, pgPos.getY() * lengthMultiplier, pgPos.getZ() * lengthMultiplier);
+    fParticleGun->SetParticlePosition(pgPos);
     fParticleGun->GeneratePrimaryVertex(anEvent);
 }
