@@ -31,6 +31,7 @@
 #include "G4PVParameterised.hh"
 #include "SiPMParameterisation.hh"
 #include "SiPMParameters.hh"
+#include "G4SubtractionSolid.hh"
 
 
 /// Detector construction class to define materials and geometry.

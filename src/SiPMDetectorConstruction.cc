@@ -55,8 +55,8 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
 
     //Scintillator size with wolfram
     G4ThreeVector coated_scintillator_size = scintillator_size; //scintillator size already calculated with the length mulitiplier
-    coated_scintillator_size.setX(coated_scintillator_size.getX() + coatingThickness);
-    coated_scintillator_size.setY(coated_scintillator_size.getY() + coatingThickness);
+    coated_scintillator_size.setX(coated_scintillator_size.getX() + (coatingThickness * 2));
+    coated_scintillator_size.setY(coated_scintillator_size.getY() + (coatingThickness * 2));
     coated_scintillator_size.setZ(coated_scintillator_size.getZ() + (coatingThickness * 2)); //both sides
 
     //World size
@@ -81,6 +81,8 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     G4double container_sizeX = coated_scintillator_size.getX();
     G4double container_sizeY = coated_scintillator_size.getY();
     G4double container_sizeZ = world_sizeZ;
+
+
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -196,10 +198,10 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     //------------------------------------------------------------------------------------------------------------------
 
     //---World definitions----------------------------------------------------------------------------------------------
-    G4Box* solidWorld = new G4Box(  "World",        //its name
-                                    world_sizeX,
-                                    world_sizeY,
-                                    world_sizeZ);   //its size
+    G4Box* solidWorld = new G4Box(  "World",                //its name
+                                    0.5 * world_sizeX,
+                                    0.5 * world_sizeY,
+                                    0.5 * world_sizeZ);   //its size
     
     G4LogicalVolume* logicWorld = new G4LogicalVolume(  solidWorld, //its solid
                                                         world_mat,  //its material
@@ -238,43 +240,8 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
                                             0.5 * coated_scintillator_size.getY(),
                                             0.5 * coated_scintillator_size.getZ());     //its size
 
-    G4LogicalVolume* logicScintCoating = new G4LogicalVolume(   solidScintCoating,      //its solid
-                                                                scint_coating,          //its material
-                                                                "ScintillatorCoating"); //its name
-
-    G4VPhysicalVolume* physScintCoating = new G4PVPlacement(0,                      //no rotation
-                                                            posScintCoating,        //at position
-                                                            logicScintCoating,      //its logical volume
-                                                            "ScintillatorCoating",  //its name
-                                                            logicContainer,         //its mother  volume
-                                                            false,                  //no boolean operation
-                                                            0,                      //copy lxenumber
-                                                            checkOverlaps);         //overlaps checking
-
 
     //---Scintillator definitions---------------------------------------------------------------------------------------
-
-    /*
-    G4Tubs* solidScint = new G4Tubs("tube",                             //name
-                                    0,                                  //inner radius
-                                    scint_radius,                       //outter radius
-                                    scintillator_size.getZ(),           //half length in Z
-                                    0,                                  //starting angle
-                                    2 * CLHEP::pi);                     //angle of the segment in rad
-
-    G4LogicalVolume* logicScint = new G4LogicalVolume(  solidScint,         //its solid
-                                                        scint_mat,          //its material
-                                                        "Scintillator");    //its name
-
-    G4VPhysicalVolume* physScint = new G4PVPlacement(   0,                      //no rotation
-                                                        posScint,               //at position
-                                                        logicScint,             //its logical volume
-                                                        "Scintillator",         //its name
-                                                        logicScintCoating,      //its mother volume
-                                                        false,                  //no boolean operation
-                                                        0,                      //copy lxenumber
-                                                        checkOverlaps);         //overlaps checking
-    */
 
     G4Box* solidScint = new G4Box(  "Scintillator",                      //its name
                                     0.5 * scintillator_size.getX(),
@@ -285,6 +252,16 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
                                                         scint_mat,              //its material
                                                         "Scintillator");    //its name
 
+    G4VSolid* solidCoating = new G4SubtractionSolid("ScintillatorCoating", 
+                                                    solidScintCoating, 
+                                                    solidScint, 
+                                                    0, 
+                                                    G4ThreeVector(0, 0, 0));
+
+    G4LogicalVolume* logicScintCoating = new G4LogicalVolume(   solidCoating,           //its solid
+                                                                scint_coating,          //its material
+                                                                "ScintillatorCoating"); //its name
+
     G4VPhysicalVolume* physScint = new G4PVPlacement(   0,               //no rotation
                                                         posScint,        //at position
                                                         logicScint,      //its logical volume
@@ -293,6 +270,16 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
                                                         false,           //no boolean operation
                                                         0,               //copy lxenumber
                                                         checkOverlaps);  //overlaps checking
+
+    G4VPhysicalVolume* physScintCoating = new G4PVPlacement(0,                      //no rotation
+                                                            posScintCoating,        //at position
+                                                            logicScintCoating,      //its logical volume
+                                                            "ScintillatorCoating",  //its name
+                                                            logicContainer,         //its mother  volume
+                                                            false,                  //no boolean operation
+                                                            0,                      //copy lxenumber
+                                                            checkOverlaps);         //overlaps checking
+
 
     G4Colour scintColour(1.0, 0, 0.0);
     G4VisAttributes* scintVisAtt = new G4VisAttributes(scintColour);
@@ -378,7 +365,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     scint_material_mpt -> AddProperty("ABSLENGTH", pp, absl, n);
     scint_material_mpt -> AddProperty("SLOWCOMPONENT", pp, slow, n);
     scint_material_mpt -> AddProperty("FASTCOMPONENT", pp, fast, n);
-    scint_material_mpt -> AddConstProperty("SCINTILLATIONYIELD", 500./MeV); //50 volt
+    scint_material_mpt -> AddConstProperty("SCINTILLATIONYIELD", 50000./MeV); //50 volt
     scint_material_mpt -> AddConstProperty("RESOLUTIONSCALE", 1.0);
     scint_material_mpt -> AddConstProperty("FASTTIMECONSTANT", 0.01*ns);
     scint_material_mpt -> AddConstProperty("SLOWTIMECONSTANT", 1.*ns);

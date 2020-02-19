@@ -59,6 +59,12 @@ Run with custom config file
 * secondsipmenabled - Enable the second SiPM
 
 # Changelog
+## 2020-02-19
+* Scintillator subtracted from it's coating
+* Scintillation process fix
+* Size and position fixes
+* Print fixes in Parameters
+
 ## 2020-02-18
 * Both SiPMs can be enabled or disabled
 * Added an option to change between a box and tube scintillator (only box tested yet)

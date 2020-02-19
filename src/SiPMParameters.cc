@@ -173,17 +173,17 @@ void SiPMParameters::StoreConfigValues(std::string key1, std::string value1)
     else if (key1.compare("scintillatorsizex") == 0)
     {
         scintillator_Dimension.setX(std::stod(value1));
-        std::cout << "Scintillator X size set from config file! Value = " << y_division << std::endl;
+        std::cout << "Scintillator X size set from config file! Value = " << scintillator_Dimension.getX() << std::endl;
     }
     else if (key1.compare("scintillatorsizey") == 0)
     {
         scintillator_Dimension.setY(std::stod(value1));
-        std::cout << "Scintillator Y size set from config file! Value = " << y_division << std::endl;
+        std::cout << "Scintillator Y size set from config file! Value = " << scintillator_Dimension.getY() << std::endl;
     }
     else if (key1.compare("scintillatorsizez") == 0)
     {
         scintillator_Dimension.setZ(std::stod(value1));
-        std::cout << "Scintillator Z size set from config file! Value = " << y_division << std::endl;
+        std::cout << "Scintillator Z size set from config file! Value = " << scintillator_Dimension.getZ() << std::endl;
     }
 
     else if (key1.compare("scintillatorisbox") == 0)
