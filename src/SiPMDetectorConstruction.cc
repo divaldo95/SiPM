@@ -165,7 +165,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     {
         z_pos_helper = coatingThickness + (scintillator_size.getZ() / 2);
         z_pos_helper = z_pos_helper - (container_sizeZ / 2);
-        posScint = G4ThreeVector(0, 0, z_pos_helper); //center on X and Y
+        //posScint = G4ThreeVector(0, 0, z_pos_helper); //center on X and Y
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -199,9 +199,10 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
 
     //---World definitions----------------------------------------------------------------------------------------------
     G4Box* solidWorld = new G4Box(  "World",                //its name
-                                    0.5 * world_sizeX,
-                                    0.5 * world_sizeY,
-                                    0.5 * world_sizeZ);   //its size
+                                    world_sizeX,
+                                    world_sizeY,
+                                    world_sizeZ);   //its size
+    //Prevent overlapping so the world size is doubled
     
     G4LogicalVolume* logicWorld = new G4LogicalVolume(  solidWorld, //its solid
                                                         world_mat,  //its material
@@ -249,14 +250,14 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
                                     0.5 * scintillator_size.getZ());     //its size
 
     G4LogicalVolume* logicScint = new G4LogicalVolume(  solidScint,         //its solid
-                                                        scint_mat,              //its material
+                                                        scint_mat,          //its material
                                                         "Scintillator");    //its name
 
     G4VSolid* solidCoating = new G4SubtractionSolid("ScintillatorCoating", 
                                                     solidScintCoating, 
-                                                    solidScint, 
+                                                    solidScint/*, 
                                                     0, 
-                                                    G4ThreeVector(0, 0, 0));
+                                                    G4ThreeVector(0, 0, 0)*/);
 
     G4LogicalVolume* logicScintCoating = new G4LogicalVolume(   solidCoating,           //its solid
                                                                 scint_coating,          //its material
@@ -266,7 +267,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
                                                         posScint,        //at position
                                                         logicScint,      //its logical volume
                                                         "Scintillator",  //its name
-                                                        logicContainer,  //its mother  volume
+        logicContainer,  //its mother  volume
                                                         false,           //no boolean operation
                                                         0,               //copy lxenumber
                                                         checkOverlaps);  //overlaps checking
@@ -365,7 +366,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     scint_material_mpt -> AddProperty("ABSLENGTH", pp, absl, n);
     scint_material_mpt -> AddProperty("SLOWCOMPONENT", pp, slow, n);
     scint_material_mpt -> AddProperty("FASTCOMPONENT", pp, fast, n);
-    scint_material_mpt -> AddConstProperty("SCINTILLATIONYIELD", 50000./MeV); //50 volt
+    scint_material_mpt -> AddConstProperty("SCINTILLATIONYIELD", 1000./MeV); //50 volt
     scint_material_mpt -> AddConstProperty("RESOLUTIONSCALE", 1.0);
     scint_material_mpt -> AddConstProperty("FASTTIMECONSTANT", 0.01*ns);
     scint_material_mpt -> AddConstProperty("SLOWTIMECONSTANT", 1.*ns);
@@ -378,7 +379,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     
     G4LogicalBorderSurface *ScintillatorSurface = new G4LogicalBorderSurface("Scintillator Surface", physScint, physScintCoating, OpScintillatorSurface);
     
-    G4double reflectivityCoating[n] = {0.9, 0.9};
+    G4double reflectivityCoating[n] = {0.99, 0.99};
     G4double efficiencyCoating[n] = {0, 0};
     
     G4MaterialPropertiesTable *ScintillatorToWolframMaterialPropertyTable = new G4MaterialPropertiesTable();
@@ -418,7 +419,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     
      int x = parameters.GetXDivison();
      int y = parameters.GetYDivison();
-     int helper = 0;
+     int copyNumber = 0;
      G4VPhysicalVolume *physContainer[x][y];
      char s1[30];
      
@@ -428,15 +429,15 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
          {
              snprintf(s1, 30, "Container_x%d_y%d", i, j);
              logicContainer -> SetName(s1);
-             physContainer[x][y] = new G4PVPlacement(0,
-                                                     G4ThreeVector(i * (container_sizeX / 2), j * (container_sizeY / 2), container_sizeZ / 2),
-                                                     logicContainer,
-                                                     s1, //its name
-                                                     logicWorld,
-                                                     false,
-                                                     helper, //copy number
-                                                     checkOverlaps);
-             helper++;
+             physContainer[i][j] = new G4PVPlacement(   0,
+                                                        G4ThreeVector(i * container_sizeX + (container_sizeX / 2) - (world_sizeX / 2), j * container_sizeY + (container_sizeY / 2) - (world_sizeY / 2), container_sizeZ / 2),
+                                                        logicContainer,
+                                                        s1, //its name
+                                                        logicWorld,
+                                                        false,
+                                                        copyNumber, //copy number
+                                                        checkOverlaps);
+             copyNumber++;
          }
      }
      //------------------------------------------------------------------------------------------------------------------

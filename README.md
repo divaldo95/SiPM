@@ -59,6 +59,12 @@ Run with custom config file
 * secondsipmenabled - Enable the second SiPM
 
 # Changelog
+## 2020-04-08
+* SiPM position fix
+* Changed scintillator mother volume
+* Changed displayLimit in vis.mac
+* New default config file
+
 ## 2020-02-19
 * Scintillator subtracted from it's coating
 * Scintillation process fix

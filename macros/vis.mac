@@ -17,6 +17,6 @@
 /vis/scene/add/eventID
 
 /vis/scene/add/text 0 6 14 cm 18 4 4 Box
-/vis/ogl/set/displayListLimit 50000
+/vis/ogl/set/displayListLimit 500000
 
 /run/beamOn 10
