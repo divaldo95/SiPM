@@ -29,6 +29,10 @@ void SiPMSteppingAction::UserSteppingAction(const G4Step* step)
     
     G4Track *fTrack = step -> GetTrack();
     G4int trackID = fTrack -> GetTrackID();
+
+    bool isOut = false; //flag if the optical photon left the volume
+    bool valid = false;
+    int sipmNum = 0;
     
     G4double postTime = step->GetPostStepPoint()->GetLocalTime();
     
@@ -50,54 +54,62 @@ void SiPMSteppingAction::UserSteppingAction(const G4Step* step)
     
     G4String preName = prevolume -> GetName();
     G4String postName = postvolume -> GetName();
-    
+
     
     G4Track *theTrack = step->GetTrack();
     G4ParticleDefinition* particleType = theTrack->GetDefinition();
+    G4String particleName = particleType->GetParticleName(); 
     if(particleType==G4OpticalPhoton::OpticalPhotonDefinition())
     {
-        if(postZ >= 40.9*cm)
-         {
-         std::cout << "Possibly hits sipm1: " << postZ  << " | " << particleType -> GetParticleName() << std::endl;
-         }
-        //std::cout << "Optical photon\n";
-        /*if(preName == "Scintillator" && postName == "Scintillator")
-         {
-         std::cout << "Photon inside Scintillator" << std::endl;
-         }*/
+        if(postName == "World") 
+        {
+            valid = true;
+            isOut = true;
+            //std::cout<<"ABCD "<< particleName <<" "<<prekinE<<std::endl;
+        }
+        else
+        {
+            isOut = false;
+        }
+        
         if(postName == "Sipm0")
         {
+            valid = true;
             fTrack -> SetTrackStatus(fStopAndKill);
             std::cout << "Photon reached Sipm0 at: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo() << std::endl;
             std::cout << "Mother Logical name: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetName() << std::endl;
             
-            analysis.Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 1, fTrack -> GetGlobalTime());
+            sipmNum = 1;
             
             //sipm0_num++;
         }
         if(postName == "Sipm1")
         {
+            valid = true; 
             fTrack -> SetTrackStatus(fStopAndKill);
             std::cout << "Photon reached Sipm1 at: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo() << std::endl;
             std::cout << "Mother Logical name: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetName() << std::endl;
             std::cout << "Coordinates: " << postX << " " << postY << std::endl;
             std::cout << "Global time: " << step -> GetPostStepPoint() -> GetGlobalTime() << std::endl;
             std::cout << "Local time: " << postTime << std::endl;
+
+            sipmNum = 2;
+
             //std::cout << "Photon reached Sipm1 at copy no: " << postvolume -> GetCopyNo() << std::endl;
             //sipm1_num++;
-            analysis.Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 2, fTrack -> GetGlobalTime());
+            //analysis.Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 2, fTrack -> GetGlobalTime());
         }
-        /*if(postName == "Scintillator_W")
-         {
-         //std::cout << "Photon reached wolfram" << std::endl;
-         }*/
+        if (valid)
+        {
+            analysis.Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, sipmNum, fTrack -> GetGlobalTime(), isOut);
+        }
+        valid = false;
     }
     else if(particleType==G4Electron::ElectronDefinition())
     {
         //std::cout << "Electron\n";
     }
     //std::cout << "Sipm0: " << sipm0_num << std::endl << "Sipm1: " << sipm1_num << std::endl;
-    
     
     // collect energy deposited in this step
     G4double edepStep = step->GetTotalEnergyDeposit();

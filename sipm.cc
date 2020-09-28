@@ -24,7 +24,7 @@
 #include "QGSP_BIC.hh"
 #include "G4OpticalPhysics.hh"
 #include "G4OpticalProcessIndex.hh"
-#include "LXePhysicsList.hh"
+#include "OpNovicePhysicsList.hh"
 #include "SiPMParameters.hh"
 #include "SiPMAnalysis.hh"
 
@@ -32,9 +32,7 @@
 
 int main(int argc, char** argv)
 {
-    SiPMParameters& parameters = SiPMParameters::GetInstance();
-    SiPMAnalysis& analysis = SiPMAnalysis::getInstance();
-    
+    SiPMParameters& parameters = SiPMParameters::GetInstance();    
     bool visualization = true;
     int NoE=0;
     
@@ -66,7 +64,9 @@ int main(int argc, char** argv)
             visualization = false;
         }
     }
-    
+    //First instance should be created after processing parameters,
+    //because it will use xdiv and ydiv from parameters to init the root file
+    SiPMAnalysis& analysis = SiPMAnalysis::getInstance();
     NoE = parameters.GetNumberOfEvents();
     
 #ifdef G4MULTITHREADED
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 #else
     G4RunManager* runManager = new G4RunManager;
 #endif
-    runManager->SetUserInitialization(new LXePhysicsList());
+    runManager->SetUserInitialization(new OpNovicePhysicsList());
     runManager->SetUserInitialization(new SiPMDetectorConstruction());
     //runManager->SetUserInitialization(new QGSP_BIC);
     runManager->SetUserInitialization(new SiPMActionInitialization());

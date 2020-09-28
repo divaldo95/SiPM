@@ -17,10 +17,8 @@
 
 #include "G4Event.hh"
 #include "G4RunManager.hh"
-#include "LXeTrajectory.hh"
 #include "G4Trajectory.hh"
 #include "G4VVisManager.hh"
-#include "LXeUserEventInformation.hh"
 
 /// Event action class
 

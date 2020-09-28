@@ -36,12 +36,13 @@ private:
 
     double x, y, e, time;
     int sipm;
+    int isOut;
     int noOfSipm = 0;
     
 public:
     ~SiPMAnalysis();
     
-    void Fill(int copyNo, double x1, double y1, double e1, int sipm1, double time1);
+    void Fill(int copyNo, double x1, double y1, double e1, int sipm1, double time1, bool isOut1);
     void Close();
 
     static SiPMAnalysis& getInstance(const std::string& _filename = "data.root");

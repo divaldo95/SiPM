@@ -16,27 +16,42 @@ SiPMAnalysis::SiPMAnalysis(const std::string& _filename) : filename(_filename)
     noOfSipm = xDiv * yDiv;
     G4int counter = 0;
     
+    int ret = 0;
+
     char filename1[30];
     char treename[30];
-    snprintf(filename1, 30, filename.c_str());
-    ttree = std::vector<TTree*>(noOfSipm,0);
+    snprintf(filename1, 30, "%s", filename.c_str());
+    ttree = std::vector<TTree*>(noOfSipm+1,0);
     
     for(int i = 0; i < xDiv; i++)
     {
         for (int j = 0; j < yDiv; j++)
         {
-            snprintf(treename, 20, "%dx_%dy",i,j);
+            ret = snprintf(treename, 20, "%dx_%dy",i,j);
+            if(ret < 0)
+            {
+                abort();
+            }
             ttree[counter] = new TTree(treename, treename);
             ttree[counter] -> Branch("x", &x);
             ttree[counter] -> Branch("y", &y);
             ttree[counter] -> Branch("e", &e);
             ttree[counter] -> Branch("sipm", &sipm);
             ttree[counter] -> Branch("time", &time);
+            ttree[counter] -> Branch("isout", &isOut);
             counter++;
         }
     }
+    //One for post = world
+    ttree[counter] = new TTree("postisworld", "postisworld");
+    ttree[counter] -> Branch("x", &x);
+    ttree[counter] -> Branch("y", &y);
+    ttree[counter] -> Branch("e", &e);
+    ttree[counter] -> Branch("sipm", &sipm);
+    ttree[counter] -> Branch("time", &time);
+    ttree[counter] -> Branch("isout", &isOut);
     counter = 0;
-    
+
     file = new TFile(filename1,"RECREATE");
 }
 
@@ -51,7 +66,7 @@ SiPMAnalysis& SiPMAnalysis::getInstance(const std::string& _filename)
     return instance;
 }
 
-void SiPMAnalysis::Fill(int copyNo, double x1, double y1, double e1, int sipm1, double time1)
+void SiPMAnalysis::Fill(int copyNo, double x1, double y1, double e1, int sipm1, double time1, bool isOut1)
 {
     //std::lock_guard<std::mutex> guard(SiPMAnalysisMutex);
 
@@ -61,16 +76,27 @@ void SiPMAnalysis::Fill(int copyNo, double x1, double y1, double e1, int sipm1, 
     e = e1;
     sipm = sipm1;
     time = time1;
+    isOut = (isOut1 ? 0:1); //if it is out, then it is 1
+    if(copyNo == 9999) //special copyNo for World
+    {
+        ttree.back() -> Fill();
+        ttree.back() -> FlushBaskets();
+    }
+    else
+    {
+        ttree[copyNo] -> Fill();
+        ttree[copyNo] -> FlushBaskets();
+    }
     
-    ttree[copyNo] -> Fill();
     
-    ttree[copyNo] -> FlushBaskets();
+    
+    
     SiPMAnalysisMutex.unlock();
 }
 
 void SiPMAnalysis::Close()
 {
-    for(int i = 0; i < noOfSipm; i++)
+    for(int i = 0; i < noOfSipm+1; i++)
     {
         ttree[i] -> Write();
     }
