@@ -31,9 +31,7 @@
 
 int main(int argc, char** argv)
 {
-    SiPMParameters& parameters = SiPMParameters::GetInstance();
-    SiPMAnalysis& analysis = SiPMAnalysis::getInstance();
-    
+    SiPMParameters& parameters = SiPMParameters::GetInstance();    
     bool visualization = true;
     int NoE=0;
     
@@ -65,7 +63,9 @@ int main(int argc, char** argv)
             visualization = false;
         }
     }
-    
+    //First instance should be created after processing parameters,
+    //because it will use xdiv and ydiv from parameters to init the root file
+    SiPMAnalysis& analysis = SiPMAnalysis::getInstance();
     NoE = parameters.GetNumberOfEvents();
     
 #ifdef G4MULTITHREADED
