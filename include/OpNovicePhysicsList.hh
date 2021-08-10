@@ -23,36 +23,66 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: LXeGeneralPhysics.hh 90338 2015-05-26 08:35:43Z gcosmo $
-//
-/// \file optical/LXe/include/LXeGeneralPhysics.hh
-/// \brief Definition of the LXeGeneralPhysics class
+/// \file OpNovice/include/OpNovicePhysicsList.hh
+/// \brief Definition of the OpNovicePhysicsList class
 //
 //
-#ifndef LXeGeneralPhysics_h
-#define LXeGeneralPhysics_h 1
+//
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+#ifndef OpNovicePhysicsList_h
+#define OpNovicePhysicsList_h 1
 
 #include "globals.hh"
-#include "G4ios.hh"
+#include "G4VUserPhysicsList.hh"
 
-#include "G4VPhysicsConstructor.hh"
+class OpNovicePhysicsListMessenger;
 
-class LXeGeneralPhysics : public G4VPhysicsConstructor
+class G4Cerenkov;
+class G4Scintillation;
+class G4OpAbsorption;
+class G4OpRayleigh;
+class G4OpMieHG;
+class G4OpBoundaryProcess;
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+class OpNovicePhysicsList : public G4VUserPhysicsList
 {
   public:
 
-    LXeGeneralPhysics(const G4String& name = "general");
-    virtual ~LXeGeneralPhysics();
+    OpNovicePhysicsList();
+    virtual ~OpNovicePhysicsList();
 
-    // This method will be invoked in the Construct() method.
-    // each particle type will be instantiated
+  public:
+
     virtual void ConstructParticle();
- 
-    // This method will be invoked in the Construct() method.
-    // each physics process will be instantiated and
-    // registered to the process manager of each particle type
     virtual void ConstructProcess();
 
+    virtual void SetCuts();
+
+    //these methods Construct physics processes and register them
+    void ConstructDecay();
+    void ConstructEM();
+    void ConstructOp();
+
+ 
+  private:
+
+    OpNovicePhysicsListMessenger* fMessenger;
+
+    static G4ThreadLocal G4int fVerboseLevel;
+    static G4ThreadLocal G4int fMaxNumPhotonStep;
+
+    static G4ThreadLocal G4Cerenkov* fCerenkovProcess;
+    static G4ThreadLocal G4Scintillation* fScintillationProcess;
+    static G4ThreadLocal G4OpAbsorption* fAbsorptionProcess;
+    static G4ThreadLocal G4OpRayleigh* fRayleighScatteringProcess;
+    static G4ThreadLocal G4OpMieHG* fMieHGScatteringProcess;
+    static G4ThreadLocal G4OpBoundaryProcess* fBoundaryProcess;
 };
 
-#endif
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+#endif /* OpNovicePhysicsList_h */

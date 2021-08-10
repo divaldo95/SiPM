@@ -71,6 +71,8 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     }
     else
     {
+        //itt miert nem a  coated_scintillator_size.getZ van? UB
+        //Ha a sipm szélesebb mint a wolfram, akkor az lesz a world szélén
         world_sizeZ = sipm_size_multiplier * sipm_size.getZ() + scintillator_size.getZ();
     }
 

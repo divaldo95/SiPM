@@ -58,7 +58,7 @@ void SiPMSteppingAction::UserSteppingAction(const G4Step* step)
     {
         if(postZ >= 40.9*cm)
          {
-         std::cout << "Possibly hits sipm1: " << postZ  << " | " << particleType -> GetParticleName() << std::endl;
+         //std::cout << "Possibly hits sipm1: " << postZ  << " | " << particleType -> GetParticleName() << std::endl;
          }
         //std::cout << "Optical photon\n";
         /*if(preName == "Scintillator" && postName == "Scintillator")
@@ -68,25 +68,37 @@ void SiPMSteppingAction::UserSteppingAction(const G4Step* step)
         if(postName == "Sipm0")
         {
             fTrack -> SetTrackStatus(fStopAndKill);
-            std::cout << "Photon reached Sipm0 at: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo() << std::endl;
-            std::cout << "Mother Logical name: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetName() << std::endl;
+            //std::cout << "Photon reached Sipm0 at: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo() << std::endl;
+            //std::cout << "Mother Logical name: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetName() << std::endl;
             
-            analysis.Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 1, fTrack -> GetGlobalTime());
+            analysis.Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 1, fTrack -> GetGlobalTime(), 0);
             
             //sipm0_num++;
         }
         if(postName == "Sipm1")
         {
             fTrack -> SetTrackStatus(fStopAndKill);
-            std::cout << "Photon reached Sipm1 at: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo() << std::endl;
-            std::cout << "Mother Logical name: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetName() << std::endl;
-            std::cout << "Coordinates: " << postX << " " << postY << std::endl;
-            std::cout << "Global time: " << step -> GetPostStepPoint() -> GetGlobalTime() << std::endl;
-            std::cout << "Local time: " << postTime << std::endl;
+            //std::cout << "Photon reached Sipm1 at: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo() << std::endl;
+            //std::cout << "Mother Logical name: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetName() << std::endl;
+            //std::cout << "Coordinates: " << postX << " " << postY << std::endl;
+            //std::cout << "Global time: " << step -> GetPostStepPoint() -> GetGlobalTime() << std::endl;
+            //std::cout << "Local time: " << postTime << std::endl;
             //std::cout << "Photon reached Sipm1 at copy no: " << postvolume -> GetCopyNo() << std::endl;
             //sipm1_num++;
-            analysis.Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 2, fTrack -> GetGlobalTime());
+            analysis.Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 2, fTrack -> GetGlobalTime(), 0);
         }
+        if(postName == "World")
+            {
+                fTrack -> SetTrackStatus(fStopAndKill);
+                std::cout << "Photon left World at: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo() << std::endl;
+                //std::cout << "Mother Logical name: " << step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetName() << std::endl;
+                std::cout << "Coordinates: " << postX << " " << postY << std::endl;
+                std::cout << "Global time: " << step -> GetPostStepPoint() -> GetGlobalTime() << std::endl;
+                std::cout << "Local time: " << postTime << std::endl;
+                //std::cout << "Photon reached Sipm1 at copy no: " << postvolume -> GetCopyNo() << std::endl;
+                //sipm1_num++;
+                //analysis.Fill(step -> GetPostStepPoint() -> GetTouchableHandle() -> GetVolume(1) -> GetCopyNo(), postX, postY, postkinE, 2, fTrack -> GetGlobalTime(), 1);
+            }
         /*if(postName == "Scintillator_W")
          {
          //std::cout << "Photon reached wolfram" << std::endl;

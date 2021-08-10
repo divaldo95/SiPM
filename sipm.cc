@@ -21,10 +21,9 @@
 #include "FTFP_BERT.hh"
 #include "G4StepLimiterPhysics.hh"
 #include "Randomize.hh"
-#include "QGSP_BIC.hh"
 #include "G4OpticalPhysics.hh"
 #include "G4OpticalProcessIndex.hh"
-#include "LXePhysicsList.hh"
+#include "OpNovicePhysicsList.hh"
 #include "SiPMParameters.hh"
 #include "SiPMAnalysis.hh"
 
@@ -76,9 +75,8 @@ int main(int argc, char** argv)
 #else
     G4RunManager* runManager = new G4RunManager;
 #endif
-    runManager->SetUserInitialization(new LXePhysicsList());
+    runManager->SetUserInitialization(new OpNovicePhysicsList());
     runManager->SetUserInitialization(new SiPMDetectorConstruction());
-    //runManager->SetUserInitialization(new QGSP_BIC);
     runManager->SetUserInitialization(new SiPMActionInitialization());
     ///////////////
     
@@ -102,6 +100,8 @@ int main(int argc, char** argv)
         ui = new G4UIExecutive(argc, argv);
         UImanager->ApplyCommand("/control/macroPath ./macros"); //set for your environment
         UImanager->ApplyCommand("/control/execute gui.mac");
+        NoE = parameters.GetNumberOfEvents();
+	    runManager->BeamOn(NoE);
         ui->SessionStart();
         delete ui;
     }
