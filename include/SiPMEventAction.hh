@@ -32,9 +32,12 @@ public:
     virtual void EndOfEventAction(const G4Event* event);
     
     void AddEdep(G4double edep) { fEdep += edep; }
+
+    void IncrementPhotonNumber() { numberOfPhotons++; }
     
 private:
     G4double  fEdep;
+    int numberOfPhotons;
     bool fForcedrawphotons;
     bool fForcenophotons;
 };

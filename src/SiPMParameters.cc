@@ -27,24 +27,40 @@ SiPMParameters::~SiPMParameters()
 
 void SiPMParameters::PrintUsedFilename()
 {
+    if(initialized && conf_loaded) return;
     std::cout << config_file << (conf_loaded ? " loaded." : " will be loaded. Call ParseConfigFile().") << std::endl;
+    initialized = true;
 }
 
 void SiPMParameters::ResetToDefaults()
 {
-    particleGun_position = G4ThreeVector(50, -5, 0);
-    particleGun_MomentumDirection = G4ThreeVector(0.5, 1, 0);
-    particleGun_energy = 1; //in GeV
+    particleGun_position = G4ThreeVector(0, 0, -5);
+    particleGun_MomentumDirection = G4ThreeVector(0, 0, 1);
+    particleGun_energy = 500; //in KeV
     
-    sipm_Dimension = G4ThreeVector(1, 1, 1); //applies to both (in cm)
-    scintillator_length = 40; //the size same as sipm
+    sipm_Dimension = G4ThreeVector(2, 2, 10); //applies to both (in cm)
+    scintillator_length = 10; //the size same as sipm
+
     
-    x_division = 10;
-    y_division = 10;
+    x_division = 1;
+    y_division = 1;
     
     scint_radius = 0.25; //in cm
     
     numberofevents = 10;
+
+    scintIsBox = true;
+    sipm1Enabled = true;
+    sipm2Enabled = false;
+
+    absLength1 = 35.0;
+    absLength2 = 35.0;
+
+    refrIndex1 = 1.59;
+    refrIndex2 = 1.57;
+
+    coatingreflectivity1 = 0.9;
+    coatingreflectivity2 = 0.9;
 }
 
 void SiPMParameters::ParseConfigFile()
@@ -258,6 +274,42 @@ void SiPMParameters::StoreConfigValues(std::string key1, std::string value1)
     {
         numberofevents = std::stod(value1);
         std::cout << "Number of events parsed from config file! Value = " << numberofevents << std::endl;
+    }
+
+    //---Absorption Length--------------------------------------------------------------------------------------------------------
+    else if(key1.compare("abslength1") == 0)
+    {
+        absLength1 = std::stod(value1);
+        std::cout << "Absorption Length1 parsed from config file! Value = " << absLength1 << std::endl;
+    }
+    else if(key1.compare("abslength2") == 0)
+    {
+        absLength2 = std::stod(value1);
+        std::cout << "Absorption Length2 parsed from config file! Value = " << absLength2 << std::endl;
+    }
+
+    //---Refractive Index---------------------------------------------------------------------------------------------------------
+    else if(key1.compare("refrindex1") == 0)
+    {
+        refrIndex1 = std::stod(value1);
+        std::cout << "Refractive Index1 parsed from config file! Value = " << refrIndex1 << std::endl;
+    }
+    else if(key1.compare("refrindex2") == 0)
+    {
+        refrIndex2 = std::stod(value1);
+        std::cout << "Refractive Index2 parsed from config file! Value = " << refrIndex2 << std::endl;
+    }
+
+    //---Coating reflectivity-----------------------------------------------------------------------------------------------------
+    else if(key1.compare("coatingreflectivity1") == 0)
+    {
+        coatingreflectivity1 = std::stod(value1);
+        std::cout << "Coating reflectivity1 parsed from config file! Value = " << coatingreflectivity1 << std::endl;
+    }
+    else if(key1.compare("coatingreflectivity2") == 0)
+    {
+        coatingreflectivity2 = std::stod(value1);
+        std::cout << "Coating reflectivity2 parsed from config file! Value = " << coatingreflectivity2 << std::endl;
     }
 }
 

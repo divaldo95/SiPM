@@ -29,6 +29,7 @@
 #include "G4LogicalSkinSurface.hh"
 #include "G4OpticalSurface.hh"
 #include "G4PVParameterised.hh"
+#include "SiPMParameterisation.hh"
 #include "SiPMParameters.hh"
 #include "G4SubtractionSolid.hh"
 

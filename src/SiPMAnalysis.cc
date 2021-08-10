@@ -19,6 +19,7 @@ SiPMAnalysis::SiPMAnalysis(const std::string& _filename) : filename(_filename)
     char filename1[30];
     char treename[30];
     snprintf(filename1, 30, filename.c_str());
+    std::cout << "Data file: " << filename1 << std::endl;
     ttree = std::vector<TTree*>(noOfSipm,0);
     
     for(int i = 0; i < xDiv; i++)
@@ -32,25 +33,13 @@ SiPMAnalysis::SiPMAnalysis(const std::string& _filename) : filename(_filename)
             ttree[counter] -> Branch("e", &e);
             ttree[counter] -> Branch("sipm", &sipm);
             ttree[counter] -> Branch("time", &time);
-            ttree[counter] -> Branch("leftScintillator", &leftScintillator);
+            ttree[counter]->Branch("leftScintillator", &leftScintillator);
             counter++;
         }
     }
     counter = 0;
     
-    
-
-    for(int i = 0; i < xDiv; i++)
-    {
-        for (int j = 0; j < yDiv; j++)
-        {
-            ttree[counter] -> SetDirectory(file);
-            counter++;
-        }
-    }
-    counter = 0;
-
-    file = new TFile(filename1, "RECREATE");
+    file = new TFile(filename1,"RECREATE");
 }
 
 SiPMAnalysis::~SiPMAnalysis()
@@ -63,7 +52,8 @@ SiPMAnalysis& SiPMAnalysis::getInstance(const std::string& _filename)
     static SiPMAnalysis instance(_filename);    
     return instance;
 }
-void SiPMAnalysis::Fill(const int &copyNo, const double &x1, const double &y1, const double &e1, const int &sipm1, const double &time1, const int &leftscint)
+
+void SiPMAnalysis::Fill(const int& copyNo, const double& x1, const double& y1, const double& e1, const int& sipm1, const double& time1, const int& leftscint)
 {
     //std::lock_guard<std::mutex> guard(SiPMAnalysisMutex);
 
@@ -74,6 +64,23 @@ void SiPMAnalysis::Fill(const int &copyNo, const double &x1, const double &y1, c
     sipm = sipm1; //which sipm
     time = time1;
     leftScintillator = leftscint;
+
+    ttree[copyNo]->Fill();
+
+    ttree[copyNo]->FlushBaskets();
+    SiPMAnalysisMutex.unlock();
+}
+
+void SiPMAnalysis::Fill(int copyNo, double x1, double y1, double e1, int sipm1, double time1)
+{
+    //std::lock_guard<std::mutex> guard(SiPMAnalysisMutex);
+
+    SiPMAnalysisMutex.lock();
+    x = x1;
+    y = y1;
+    e = e1;
+    sipm = sipm1;
+    time = time1;
     
     ttree[copyNo] -> Fill();
     

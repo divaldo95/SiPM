@@ -100,6 +100,27 @@ public:
     //---Number of Events----------------------------------------------------------------------------------
     void SetNumberOfEvents(G4int noe1) { numberofevents = noe1; }
     G4int GetNumberOfEvents() { return numberofevents; }
+
+    //Absorption lenght
+    void SetAbsorptionLength1(G4double l) { absLength1 = l; }
+    G4double GetAbsorptionLength1() { return absLength1; }
+    void SetAbsorptionLength2(G4double l) { absLength2 = l; }
+    G4double GetAbsorptionLength2() { return absLength2; }
+
+    //Refraction Index
+    void SetRefractiveIndex1(G4double i) { refrIndex1 = i; }
+    G4double GetRefractiveIndex1() { return refrIndex1; }
+    void SetRefractiveIndex2(G4double i) { refrIndex2 = i; }
+    G4double GetRefractiveIndex2() { return refrIndex2; }
+
+    //Coating reflectivity
+    void SetCoatingReflectivity1(G4double r) { coatingreflectivity1 = r; }
+    G4double GetCoatingReflectivity1() { return coatingreflectivity1; }
+    void SetCoatingReflectivity2(G4double r) { coatingreflectivity2 = r; }
+    G4double GetCoatingReflectivity2() { return coatingreflectivity2; }
+
+    //Init things
+    bool initialized = false;
     
     void ResetToDefaults();
 
@@ -129,6 +150,14 @@ private:
     G4int y_division;
     
     G4int numberofevents;
+
+    G4double absLength1;
+    G4double absLength2;
+    G4double refrIndex1;
+    G4double refrIndex2;
+
+    G4double coatingreflectivity1;
+    G4double coatingreflectivity2;
 
     bool scintIsBox = true;
     bool sipm1Enabled = true;

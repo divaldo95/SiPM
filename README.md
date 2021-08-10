@@ -59,16 +59,6 @@ Run with custom config file
 * secondsipmenabled - Enable the second SiPM
 
 # Changelog
-## 2020-09-28
-* Added a new TTree for photons which reached the world
-* Got rid of some warnings
-
-## 2020-09-27
-* Fixed numbering in output root file
-* Completely removed LXe related files
-* Physics list changed to OpNovice
-* Minor changes
-
 ## 2020-04-08
 * SiPM position fix
 * Changed scintillator mother volume

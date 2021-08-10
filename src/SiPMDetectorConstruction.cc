@@ -82,7 +82,13 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     G4double container_sizeY = coated_scintillator_size.getY();
     G4double container_sizeZ = world_sizeZ;
 
+    G4double absLength1 = parameters.GetAbsorptionLength1();
+    G4double absLength2 = parameters.GetAbsorptionLength2();
+    G4double refrIndex1 = parameters.GetRefractiveIndex1();
+    G4double refrIndex2 = parameters.GetRefractiveIndex2();
 
+    G4double coatingReflectivity1 = parameters.GetCoatingReflectivity1();
+    G4double coatingReflectivity2 = parameters.GetCoatingReflectivity2();
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -218,7 +224,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
                                                         "World",            //its name
                                                         0,                  //its mother  volume
                                                         false,              //no boolean operation
-                                                        9999,                  //copy number
+                                                        0,                  //copy lxenumber
                                                         checkOverlaps);     //overlaps checking
     //------------------------------------------------------------------------------------------------------------------
 
@@ -273,7 +279,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
                                                         "Scintillator",  //its name
         logicContainer,  //its mother  volume
                                                         false,           //no boolean operation
-                                                        0,               //copy number
+                                                        0,               //copy lxenumber
                                                         checkOverlaps);  //overlaps checking
 
     G4VPhysicalVolume* physScintCoating = new G4PVPlacement(0,                      //no rotation
@@ -282,7 +288,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
                                                             "ScintillatorCoating",  //its name
                                                             logicContainer,         //its mother  volume
                                                             false,                  //no boolean operation
-                                                            0,                      //copy number
+                                                            0,                      //copy lxenumber
                                                             checkOverlaps);         //overlaps checking
 
 
@@ -315,7 +321,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
                                         "Sipm0",        //its name
                                         logicContainer, //its mother  volume
                                         false,          //no boolean operation
-                                        0,              //copy number
+                                        0,              //copy lxenumber
                                         checkOverlaps); //overlaps checking
         sipmVisAtt = new G4VisAttributes(sipmColour);
         logicSipm0->SetVisAttributes(sipmVisAtt);
@@ -345,7 +351,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
                                         "Sipm1",        //its name
                                         logicContainer, //its mother  volume
                                         false,          //no boolean operation
-                                        0,              //copy number
+                                        0,              //copy lxenumber
                                         checkOverlaps); //overlaps checking
 
         logicSipm1->SetVisAttributes(sipmVisAtt);
@@ -359,8 +365,8 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     
     //---General Material Settings--------------------------------------------------------------------------------------   
     //material of scintillator
-    G4double rind_scintillator[n] = {1.59, 1.57}; //refraction index
-    G4double absl[n] = {35*m, 35*m}; //absorption length
+    G4double rind_scintillator[n] = {refrIndex1, refrIndex2}; //{1.59, 1.57}; //refraction index
+    G4double absl[n] = {absLength1*m, absLength2*m}; //{35*m, 35*m}; //absorption length
     G4double slow[n] = {1, 1};  //keresd meg ez mi a fenet csinal UB
     G4double fast[n] = {1, 1};  //meg ez UB
     
@@ -383,7 +389,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     
     G4LogicalBorderSurface *ScintillatorSurface = new G4LogicalBorderSurface("Scintillator Surface", physScint, physScintCoating, OpScintillatorSurface);
     
-    G4double reflectivityCoating[n] = {0.9, 0.9};
+    G4double reflectivityCoating[n] = {coatingReflectivity1, coatingReflectivity2};
     G4double efficiencyCoating[n] = {0, 0};
     
     G4MaterialPropertiesTable *ScintillatorToWolframMaterialPropertyTable = new G4MaterialPropertiesTable();
