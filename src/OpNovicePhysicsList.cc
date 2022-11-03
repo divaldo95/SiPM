@@ -227,7 +227,7 @@ void OpNovicePhysicsList::ConstructOp()
   fCerenkovProcess->SetTrackSecondariesFirst(true);
   
   fScintillationProcess = new G4Scintillation("Scintillation");
-  fScintillationProcess->SetScintillationYieldFactor(1.);
+  //fScintillationProcess->SetScintillationYieldFactor(1.);
   fScintillationProcess->SetTrackSecondariesFirst(true);
   fAbsorptionProcess = new G4OpAbsorption();
   fRayleighScatteringProcess = new G4OpRayleigh();

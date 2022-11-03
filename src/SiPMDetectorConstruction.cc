@@ -49,7 +49,7 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     scintillator_size.setZ(scintillator_size.getZ() * lengthMultiplier);
 
     //Scintillator radius | only used if the shape of the scintillator is set to tube
-    G4double scint_radius = parameters.GetScintillatorRadius() * lengthMultiplier;
+    //G4double scint_radius = parameters.GetScintillatorRadius() * lengthMultiplier;
 
     G4double coatingThickness = parameters.CoatingThickness() * lengthMultiplier;
 
@@ -67,15 +67,15 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     G4double world_sizeZ = 0;
     if (coatingThickness > sipm_size.getZ()) //if coating thicker than sipm, then increase the worldZ by the coating thickness
     {
-        world_sizeZ = coated_scintillator_size.getZ()+2*cm;
+        world_sizeZ = coated_scintillator_size.getZ()+100*cm;
     }
     else
     {
-      world_sizeZ = sipm_size_multiplier * sipm_size.getZ() + scintillator_size.getZ()+2*cm; //itt miert nem a  coated_scintillator_size.getZ van? UB
+      world_sizeZ = sipm_size_multiplier * sipm_size.getZ() + scintillator_size.getZ()+100*cm; //itt miert nem a  coated_scintillator_size.getZ van? UB
     }
     //add +2*cm to see the scattered out gammas 
-    G4double world_sizeX = (parameters.GetXDivison()) * coated_scintillator_size.getX();
-    G4double world_sizeY = (parameters.GetYDivison()) * coated_scintillator_size.getY();
+    G4double world_sizeX = 2.0 * (parameters.GetXDivison()) * coated_scintillator_size.getX();
+    G4double world_sizeY = 2.0 * (parameters.GetYDivison()) * coated_scintillator_size.getY();
 
     //Container sizes
     G4double container_sizeX = coated_scintillator_size.getX();
@@ -367,20 +367,20 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
     //material of scintillator
     G4double rind_scintillator[n] = {refrIndex1, refrIndex2}; //{1.59, 1.57}; //refraction index
     G4double absl[n] = {absLength1*m, absLength2*m}; //{35*m, 35*m}; //absorption length
-    G4double slow[n] = {1, 1};  //keresd meg ez mi a fenet csinal UB
-    G4double fast[n] = {1, 1};  //meg ez UB
+    G4double slow[n] = {1, 1};
+    G4double fast[n] = {1, 1};
     
     G4MaterialPropertiesTable *scint_material_mpt = new G4MaterialPropertiesTable();
     
     scint_material_mpt -> AddProperty("RINDEX", pp, rind_scintillator, n);
     scint_material_mpt -> AddProperty("ABSLENGTH", pp, absl, n);
-    scint_material_mpt -> AddProperty("SLOWCOMPONENT", pp, slow, n);
-    scint_material_mpt -> AddProperty("FASTCOMPONENT", pp, fast, n);
+    scint_material_mpt -> AddProperty("SCINTILLATIONCOMPONENT1", pp, slow, n);
+    scint_material_mpt -> AddProperty("SCINTILLATIONCOMPONENT2", pp, fast, n);
     scint_material_mpt -> AddConstProperty("SCINTILLATIONYIELD", 1000./MeV); //50 volt
     scint_material_mpt -> AddConstProperty("RESOLUTIONSCALE", 1.0);
-    scint_material_mpt -> AddConstProperty("FASTTIMECONSTANT", 0.01*ns);  //meg ez UB
-    scint_material_mpt -> AddConstProperty("SLOWTIMECONSTANT", 1.*ns);//meg ez UB
-    scint_material_mpt -> AddConstProperty("YIELDRATIO", 0.1);//meg ez UB
+    scint_material_mpt -> AddConstProperty("SCINTILLATIONTIMECONSTANT1", 0.01*ns);  
+    scint_material_mpt -> AddConstProperty("SCINTILLATIONTIMECONSTANT2", 1.*ns);
+    scint_material_mpt -> AddConstProperty("SCINTILLATIONYIELD1", 0.1);
     
     scint_mat -> SetMaterialPropertiesTable(scint_material_mpt);
     
@@ -440,7 +440,10 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
              snprintf(s1, 30, "Container_x%d_y%d", i, j);
              logicContainer -> SetName(s1);
              physContainer[i][j] = new G4PVPlacement(   0,
-                                                        G4ThreeVector(i * container_sizeX + (container_sizeX / 2) - (world_sizeX / 2), j * container_sizeY + (container_sizeY / 2) - (world_sizeY / 2), container_sizeZ / 2),
+                                                        //G4ThreeVector(i * container_sizeX + (container_sizeX / 2) - (world_sizeX / 2), j * container_sizeY + (container_sizeY / 2) - (world_sizeY / 2), container_sizeZ / 2),
+                                                        G4ThreeVector(i * container_sizeX + (container_sizeX / 2) - x * (container_sizeX / 2),
+                                                            j * container_sizeY + (container_sizeY / 2) - y * (container_sizeY / 2), 
+                                                            container_sizeZ / 2 ),
                                                         logicContainer,
                                                         s1, //its name
                                                         logicWorld,
@@ -451,5 +454,68 @@ G4VPhysicalVolume* SiPMDetectorConstruction::Construct()
          }
      }
      //------------------------------------------------------------------------------------------------------------------
+
+    /*
+    //PlexiGlass
+    G4Material* plexi_mat = nist->FindOrBuildMaterial("G4_PLEXIGLASS");
+    G4ThreeVector posPlexi = G4ThreeVector(0, 0, -30*cm);
+
+    G4double sizeZ_Plexi = 20*cm;
+    G4double sizeXY_Plexi = 40*cm;
+
+    G4Box *solidPlexi = new G4Box(  "Plexi",                    //its name
+                                 0.5 * sizeXY_Plexi,
+                                 0.5 * sizeXY_Plexi,
+                                 0.5 * sizeZ_Plexi);    //its size
+
+    G4LogicalVolume* logicPlexi = new G4LogicalVolume(  solidPlexi, //its solid
+                                                        plexi_mat,  //its material
+                                                        "Plexi");   //its name
+
+    new G4PVPlacement(0,                       //no rotation
+                    posPlexi,                    //at position
+                    logicPlexi,             //its logical volume
+                    "Plexi",                //its name
+                    logicWorld,                //its mother  volume
+                    false,                   //no boolean operation
+                    0,                       //copy number
+                    checkOverlaps);          //overlaps checking
+
+    G4Colour plexiColour( 0.0, 0.0, 1.0); //RGB
+    G4VisAttributes* plexiVisAtt = new G4VisAttributes( plexiColour );
+    logicPlexi->SetVisAttributes(plexiVisAtt);
+
+    //Bone inside PlexiGlass
+    G4Material* bone_mat = nist->FindOrBuildMaterial("G4_PLEXIGLASS");
+    G4ThreeVector posBone = G4ThreeVector(0, 0, 0*cm);
+
+    
+    G4double sizeX_Bone = 10*cm;
+    G4double sizeY_Bone = 5*cm;
+    G4double sizeZ_Bone = 5*cm;
+
+    G4Box *solidBone = new G4Box(  "Bone",                    //its name
+                                 0.5 * sizeX_Bone,
+                                 0.5 * sizeY_Bone,
+                                 0.5 * sizeZ_Bone);    //its size
+
+    G4LogicalVolume* logicBone = new G4LogicalVolume(  solidBone, //its solid
+                                                        bone_mat,  //its material
+                                                        "Bone");   //its name
+
+    new G4PVPlacement(0,                       //no rotation
+                    posBone,                    //at position
+                    logicBone,             //its logical volume
+                    "Bone",                //its name
+                    logicPlexi,                //its mother  volume
+                    false,                   //no boolean operation
+                    0,                       //copy number
+                    checkOverlaps);          //overlaps checking
+    */
+   
+    //G4Colour boneColour( 0.0, 0.0, 1.0); //RGB
+    //G4VisAttributes* boneVisAtt = new G4VisAttributes( boneColour );
+    //logicBone->SetVisAttributes(boneVisAtt);
+                                            
     return physWorld;
 }

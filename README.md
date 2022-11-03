@@ -59,6 +59,9 @@ Run with custom config file
 * secondsipmenabled - Enable the second SiPM
 
 # Changelog
+## 2022-11-03
+* Geant4 11 compatibility
+
 ## 2020-04-08
 * SiPM position fix
 * Changed scintillator mother volume
